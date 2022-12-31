@@ -13,8 +13,8 @@ const speedMaxCW  = 544;
 const speedMaxCCW = 2400;
 const speedStop   = (speedMaxCW + speedMaxCCW) / 2;
 
-let curtainState = 'up';
-let isAutoMode   = true;
+let currentCurtainState = 'top';
+let isAutoMode          = true;
 
 const setServoValue = (value) => {
   servo.write(value, 'us');
@@ -46,10 +46,22 @@ ir.on('receive', (code, repeat) => {
 
 const handleLuxesCheck = (luxes) => {
   if (isAutoMode) {
-    if (luxes > 50) {
-      console.log('yep');
-    } else {
-      console.log('yep');
+    if (luxes > 50 && currentCurtainState === 'bottom') {
+      return;
+    } else if (luxes > 50 && currentCurtainState !== 'bottom') {
+      setServoValue(speedMaxCW);
+      setTimeout(() => {
+        setServoValue(speedStop);
+      }, 1500);
+      currentCurtainState = 'bottom';
+    } else if (luxes < 50 && currentCurtainState === 'top') {
+      return;
+    } else if (luxes < 50 && currentCurtainState !== 'top') {
+      setServoValue(speedMaxCCW);
+      setTimeout(() => {
+        setServoValue(speedStop);
+      }, 1500);
+      currentCurtainState = 'top';
     }
   }
 };
@@ -57,4 +69,4 @@ const handleLuxesCheck = (luxes) => {
 setInterval(() => {
   let luxes = lightSensor.read('lx').toFixed(0);
   handleLuxesCheck(luxes);
-}, 1000);
+}, 3000);
