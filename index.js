@@ -9,6 +9,7 @@ const modeButtonOff = 378126399;
 const modeButtonOn  = 378077439;
 const stopButton    = 378091719;
 
+const maxBright   = 5000;
 const speedMaxCW  = 544;
 const speedMaxCCW = 2400;
 const speedStop   = (speedMaxCW + speedMaxCCW) / 2;
@@ -18,6 +19,12 @@ let isAutoMode          = true;
 
 const setServoValue = (value) => {
   servo.write(value, 'us');
+};
+
+const servoStop = () => {
+  setTimeout(() => {
+    setServoValue(speedStop);
+  }, 14500);
 };
 
 ir.on('receive', (code, repeat) => {
@@ -46,21 +53,17 @@ ir.on('receive', (code, repeat) => {
 
 const handleLuxesCheck = (luxes) => {
   if (isAutoMode) {
-    if (luxes > 50 && currentCurtainState === 'bottom') {
+    if (luxes > maxBright && currentCurtainState === 'bottom') {
       return;
-    } else if (luxes > 50 && currentCurtainState !== 'bottom') {
+    } else if (luxes > maxBright && currentCurtainState !== 'bottom') {
       setServoValue(speedMaxCW);
-      setTimeout(() => {
-        setServoValue(speedStop);
-      }, 1500);
+      servoStop();
       currentCurtainState = 'bottom';
-    } else if (luxes < 50 && currentCurtainState === 'top') {
+    } else if (luxes < maxBright && currentCurtainState === 'top') {
       return;
-    } else if (luxes < 50 && currentCurtainState !== 'top') {
+    } else if (luxes < maxBright && currentCurtainState !== 'top') {
       setServoValue(speedMaxCCW);
-      setTimeout(() => {
-        setServoValue(speedStop);
-      }, 1500);
+      servoStop();
       currentCurtainState = 'top';
     }
   }
@@ -69,4 +72,4 @@ const handleLuxesCheck = (luxes) => {
 setInterval(() => {
   let luxes = lightSensor.read('lx').toFixed(0);
   handleLuxesCheck(luxes);
-}, 3000);
+}, 60000);
