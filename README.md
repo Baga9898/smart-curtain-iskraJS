@@ -58,6 +58,8 @@ Further along are the constants responsible for the states of the servo.
     const speedMaxCCW = 2400;
     const speedStop   = (speedMaxCW + speedMaxCCW) / 2;
 
+![](assets/servoImpulses.png)
+
 in PDM servos of constant rotation, the speed of rotation of the shaft depends on the pulse length.</br>
 For more information, [take a look](http://wiki.amperka.ru/articles:servo-pdm-continuous-rotation).
 
